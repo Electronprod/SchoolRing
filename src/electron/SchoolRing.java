@@ -5,8 +5,14 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+import org.json.simple.JSONObject;
 
 import electron.data.DirOptions;
 import electron.data.database;
@@ -14,9 +20,12 @@ import electron.ring.ringThread;
 import electron.utils.logger;
 
 public class SchoolRing extends JPanel {
+	//Directories for music
 	public static File musicDir1 = new File("fromlesson");
 	public static File musicDir2 = new File("tolesson");
-    private JList listField;
+	public static File musicDir3 = new File("beforelesson");
+	//GUI values
+    private JScrollPane ScrollField;
     private JButton createbtn;
     private JButton deletebtn;
     private JTextField dateField;
@@ -26,18 +35,26 @@ public class SchoolRing extends JPanel {
     private JLabel status;
     private JLabel about;
     private JButton github;
-    private String[] listInfo;
-
+    private java.util.List<String> listInfo;
+    private String[] jcomp8Items = {"From lesson", "To lesson","Before lesson"};
+    
+    /**
+     * GUI builder and worker
+     */
     public SchoolRing() {
         //construct preComponents
-        listInfo = database.getAll().toArray(new String[0]);
-        String[] jcomp8Items = {"1-from lesson", "2-to lesson"};
-
+    	listInfo=database.getAll();
+        final DefaultListModel listModel = new DefaultListModel();
+        for (int i = 0; i < listInfo.size(); i++) {
+            listModel.addElement(listInfo.get(i));
+        }
         //construct components
-        listField = new JList (listInfo);
+        final JList list = new JList(listModel);
+        ScrollField = new JScrollPane (list);
         createbtn = new JButton ("Create");
         deletebtn = new JButton ("Delete");
         dateField = new JTextField (5);
+        dateField.setText("9:00");
         title1 = new JLabel ("Time");
         title2 = new JLabel ("Ring type:");
         typeSelector = new JComboBox (jcomp8Items);
@@ -50,7 +67,7 @@ public class SchoolRing extends JPanel {
         setLayout (null);
 
         //add components
-        add (listField);
+        add (ScrollField);
         add (createbtn);
         add (deletebtn);
         add (dateField);
@@ -62,7 +79,16 @@ public class SchoolRing extends JPanel {
         add (github);
 
         //set component bounds (only needed by Absolute Positioning)
-        listField.setBounds (5, 5, 235, 300);
+        ScrollField.setBounds (5, 5, 235, 300);
+        list.addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				if(list.getSelectedIndex()==-1) {status.setText("Select item to show type");return;}
+				JSONObject obj = database.getInfoItem(listInfo.get(list.getSelectedIndex()));
+				status.setText("Selected type: "+jcomp8Items[Integer.parseInt(String.valueOf(obj.get("type")))-1]);
+				
+			}       	
+        });
         createbtn.setBounds (245, 125, 100, 25);
         createbtn.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
@@ -70,23 +96,32 @@ public class SchoolRing extends JPanel {
         			JOptionPane.showMessageDialog(new JFrame(), "ERROR: this time already exists!", "SchoolRing", JOptionPane.ERROR_MESSAGE);
         			return;
         		}
-        		listInfo = database.getAll().toArray(new String[0]);
+        		java.util.List<String> sorted = database.getAll();
+        		Collections.sort(sorted);
+        		listInfo = sorted;
         		database.add(dateField.getText(), (typeSelector.getSelectedIndex()+1));
         		status.setText("Added time to database. Type added: "+(typeSelector.getSelectedIndex()+1));
-        		listField.setListData(database.getAll().toArray(new String[0]));
+        		java.util.List<String> sorted1 = database.getAll();
+        		Collections.sort(sorted1);
+        		listInfo = sorted1;
+        		list.setListData(sorted1.toArray(new String[0]));
         		repaint();
         	}});
         deletebtn.setBounds (245, 160, 100, 25);
         deletebtn.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-        		if(listField.isSelectionEmpty()) {
+        		if(list.isSelectionEmpty()) {
         			JOptionPane.showMessageDialog(new JFrame(), "Please, select time you want to delete", "SchoolRing", JOptionPane.ERROR_MESSAGE);
-        			listField.setListData(database.getAll().toArray(new String[0]));
         			return;
         		}
-        		listInfo = database.getAll().toArray(new String[0]);
-        		database.remove(listInfo[listField.getSelectedIndex()]);
-        		listField.setListData(database.getAll().toArray(new String[0]));
+        		java.util.List<String> sorted = database.getAll();
+        		Collections.sort(sorted);
+        		listInfo = sorted;
+        		database.remove(listInfo.get(list.getSelectedIndex()));
+        		java.util.List<String> sorted1 = database.getAll();
+        		Collections.sort(sorted1);
+        		list.setListData(sorted1.toArray(new String[0]));
+        		listInfo = sorted1;
         		status.setText("Removed time from database.");
         		repaint();
         	}});
@@ -103,10 +138,9 @@ public class SchoolRing extends JPanel {
         				try {
 							Desktop.getDesktop().browse(new URI("https://github.com/Electronprod/SchoolRing"));
 						} catch (IOException | URISyntaxException e1) {
-							JOptionPane.showMessageDialog(new JFrame(), "ERROR BROWSING: "+e1.getMessage(), "SchoolRing", JOptionPane.ERROR_MESSAGE);
+							JOptionPane.showMessageDialog(new JFrame(), "ERROR: "+e1.getMessage(), "SchoolRing", JOptionPane.ERROR_MESSAGE);
 		        			e1.printStackTrace();
-						}
-            		
+						}	
             	}
         }});
     }
@@ -114,13 +148,19 @@ public class SchoolRing extends JPanel {
 
     public static void main (String[] args) {
     	logger.enDebug=false; // for developers
+    	//Load database
     	database.load();
+    	//Load directories
     	DirOptions.loadDir(musicDir1);
     	DirOptions.loadDir(musicDir2);
-        JFrame frame = new JFrame ("SchoolRing by Electron_prod");
+    	DirOptions.loadDir(musicDir3);
+    	//Create GUI
+        JFrame frame = new JFrame ("SchoolRing");
         frame.setDefaultCloseOperation (JFrame.HIDE_ON_CLOSE);
         frame.getContentPane().add (new SchoolRing());
         frame.setResizable(false);
+        Image image = Toolkit.getDefaultToolkit().getImage("icon.png");
+        frame.setIconImage(image);;
         frame.pack();
         frame.setVisible (true);
         frame.addWindowListener(new WindowAdapter()
@@ -128,14 +168,20 @@ public class SchoolRing extends JPanel {
             @Override
             public void windowClosing(WindowEvent e)
             {
-              System.out.println("[TRAY]: Window closed.");
+              logger.log("[TRAY]: Window closed.");
               enableTrayIcon(frame);
               e.getWindow().dispose();
             }
         });
+        //Start time checker thread
         Thread c = new ringThread();
         c.start();
     }
+    
+    /**
+     * Tray mode function
+     * @param fr - frame to hide
+     */
 	 private static void enableTrayIcon(JFrame fr) {
 		    if(!SystemTray.isSupported() ) {
 		      System.out.println("[TRAY]: function not supported. Program is going to exit, bye.");
@@ -153,7 +199,6 @@ public class SchoolRing extends JPanel {
 		      }
 		    });
 		    trayMenu.add(exit);
-
 		    Image image = Toolkit.getDefaultToolkit().getImage("icon.png");
 		    TrayIcon trayIcon = new TrayIcon(image, "SchoolRing", trayMenu);
 		    trayIcon.setImageAutoSize(true);
@@ -161,7 +206,7 @@ public class SchoolRing extends JPanel {
 			      @Override
 			      public void actionPerformed(ActionEvent e) {
 			        fr.setVisible(true);
-			        System.out.println("[TRAY]: Showed window.");
+			        logger.log("[TRAY]: Showed window.");
 			        tray.remove(trayIcon);
 			      }
 			    });

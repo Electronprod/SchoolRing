@@ -17,6 +17,7 @@ public class database {
 	private static File clFile = new File("settings.txt");
 	public static List<String> timesType1 = new ArrayList();
 	public static List<String> timesType2 = new ArrayList();
+	public static List<String> timesType3 = new ArrayList();
 	/**
 	 * Load method. Must be called before using other functions from this class.
 	 */
@@ -30,7 +31,13 @@ public class database {
 		}
 		Collections.sort(timesType1);
 		Collections.sort(timesType2);
+		Collections.sort(timesType3);
 	}
+	/**
+	 * Add item to database method
+	 * @param time - time to add
+	 * @param type - type of time
+	 */
 	public static void add(String time,int type) {
 		JSONObject obj = new JSONObject();
 		obj.put("type", type);
@@ -47,6 +54,10 @@ public class database {
 			write(arr.toJSONString());
 		}
 	}
+	/**
+	 * Remove item from database method
+	 * @param in - time to remove
+	 */
 	public static void remove(String in) {
 		if(FileOptions.getFileLines(clFile.getPath().toString()).isEmpty()) {
 			JOptionPane.showMessageDialog(new JFrame(), "ERROR: database is empty", "SchoolRing", JOptionPane.ERROR_MESSAGE);
@@ -57,8 +68,13 @@ public class database {
 			if(item.get("time").equals(in)) {
 				if(Integer.parseInt(String.valueOf(item.get("type"))) == 1) {
 					timesType1.remove(String.valueOf(item.get("time")));
-				}else {
+				}else if(Integer.parseInt(String.valueOf(item.get("type"))) == 2){
 					timesType2.remove(String.valueOf(item.get("time")));
+				}else if(Integer.parseInt(String.valueOf(item.get("type"))) == 3){
+					timesType3.remove(String.valueOf(item.get("time")));
+				}else {
+					JOptionPane.showMessageDialog(new JFrame(), "ERROR: type of item removing is incorrect", "SchoolRing", JOptionPane.ERROR_MESSAGE);
+					return;
 				}
 				arr.remove(item);
 				logger.log("Removed item "+item.get("time")+". Type of item: "+Integer.parseInt(String.valueOf(item.get("type"))));
@@ -67,29 +83,54 @@ public class database {
 		}
 		write(arr.toJSONString());
 	}
+	public static JSONObject getInfoItem(String in) {
+		JSONArray arr = (JSONArray) FileOptions.ParseJs(FileOptions.getFileLine(clFile));
+		for(int i = 0;i<arr.size();i++) {
+			JSONObject item = (JSONObject) arr.get(i);
+			if(item.get("time").equals(in)) {
+				return item;
+			}
+		}
+		return null;
+	}
+	/**
+	 * Add JSONObject to it`s list
+	 * 1-list1
+	 * 2-list2
+	 * 3-list3
+	 */
 	private static void addTimeType(JSONObject obj) {
 		if(Integer.parseInt(String.valueOf(obj.get("type"))) == 1) {
 			timesType1.add(String.valueOf(obj.get("time")));
-		}else {
+		}else if(Integer.parseInt(String.valueOf(obj.get("type"))) == 2){
 			timesType2.add(String.valueOf(obj.get("time")));
+		}else{
+			timesType3.add(String.valueOf(obj.get("time")));
 		}
 	}
 	/**
 	 * Get list of times for type
-	 * @param type - if 1 -1 type/other-2 type
+	 * @param type - type of list you want to get
 	 * @return times for this type
 	 */
 	public static List<String> get(int type) {
 		if(type == 1) {
 			return timesType1;
-		}else {
+		}else if (type==2){
 			return timesType2;
+		}else {
+			return timesType3;
 		}
 	}
+	/**
+	 * Get list with all times
+	 * @return list with all times
+	 */
 	public static List<String> getAll(){
 		List<String> arr = new ArrayList();
 		arr.addAll(timesType1);
 		arr.addAll(timesType2);
+		arr.addAll(timesType3);
 		return arr;
 	}
 	/**

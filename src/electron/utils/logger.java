@@ -1,7 +1,9 @@
 package electron.utils;
 
 public class logger {
-	//Enable/Disable debug
+	/**
+	 * Enable or disable debug messages
+	 */
 	public static boolean enDebug = false;
 	
 	public static void log(String msg) {

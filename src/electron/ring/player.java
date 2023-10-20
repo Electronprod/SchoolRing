@@ -11,6 +11,11 @@ import java.util.List;
 import electron.utils.logger;
 
 public class player {
+	/**
+	 * Method,that selects music to play
+	 * @param toplay - music list to play
+	 * @throws InterruptedException
+	 */
 	public static void selectMusic(List<File> toplay) throws InterruptedException {
 		int exeptions=0;
 		while(true) {
@@ -18,12 +23,17 @@ public class player {
 			break;
 		}
 		if(exeptions>=5) {
-			JOptionPane.showMessageDialog(new JFrame(), "ERROR: tried to play 5 files.\n All have unsupported format or bitrate.", "[AUDIO_SYSTEM]", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(new JFrame(), "ERROR: tried to play 5 music files.\n All have unsupported format or bitrate.", "[AUDIO_SYSTEM]", JOptionPane.ERROR_MESSAGE);
 			break;
 		}
 		exeptions++;
 		}
 	}
+	/**
+	 * Play music function
+	 * @param filename - file to play
+	 * @return state - true:played or false:not
+	 */
 	private static boolean play(File filename){
 		logger.log("[AUDIO_PLAYER]: Playing: "+filename.getName());
 	    try{
@@ -42,9 +52,14 @@ public class player {
 	       return false;
 	    }
 	}
-	private static int random(int maxq) {
+	/**
+	 * Generate random number method
+	 * @param max - max number to generate from 0
+	 * @return random number from 0 to max
+	 */
+	private static int random(int max) {
 		java.util.Random random = new java.util.Random();
-		int i = random.nextInt(maxq);
+		int i = random.nextInt(max);
 		return i;
 	}
 }

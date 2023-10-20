@@ -12,6 +12,10 @@ public class DirOptions {
 	private static void log(String msg) {logger.log(msg);}
 	private static void logerr(String msg) {logger.error(msg);}
 	
+	/**
+	 * Load method for directory
+	 * @param file - directory
+	 */
 	public static void loadDir(File file) {
 		if(!file.exists()) {
 			if(!file.mkdir()) {
@@ -24,6 +28,11 @@ public class DirOptions {
 		}
 		
 	}
+	/**
+	 * Get all files from directory
+	 * @param musicDir1 - directory
+	 * @return files list
+	 */
 	public static List<File> getFilesDir(File musicDir1) {
 		List<File> fls =  new ArrayList();
 		File folder = musicDir1;
