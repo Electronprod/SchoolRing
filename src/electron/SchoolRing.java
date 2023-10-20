@@ -97,7 +97,7 @@ public class SchoolRing extends JPanel {
         status.setBounds (0, 305, 230, 25);
         about.setBounds (250, 225, 90, 35);
         github.setBounds (255, 265, 80, 15);
-        deletebtn.addActionListener(new ActionListener() {
+        github.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
             	if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {		    
         				try {
