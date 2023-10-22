@@ -16,9 +16,9 @@ Simple application, that provides ring system for schools.
   8. Run SchoolRing.jar file
   9. Installation done
 ## What is "tolesson" and "fromlesson" directory?
-The program uses different ring to and from class. In "tolesson" dir you must put music,
+The program uses different ring to/from/before lesson. In "tolesson" dir you must put music,
 that going to play, when lesson is starting. In "fromlesson" dir you must put music,that
-going to play, when lesson ending.
+going to play, when lesson ending. With "beforelesson" dir all the same.
 
-!While you configuring you can set type of ring in selector.
+While you configuring you can set type of ring in selector.
 
