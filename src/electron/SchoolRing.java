@@ -48,7 +48,7 @@ public class SchoolRing extends JPanel {
         for (int i = 0; i < listInfo.size(); i++) {
             listModel.addElement(listInfo.get(i));
         }
-        //construct components (GUI)
+        //construct components
         final JList list = new JList(listModel);
         ScrollField = new JScrollPane (list);
         createbtn = new JButton ("Create");
