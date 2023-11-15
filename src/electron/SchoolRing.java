@@ -154,7 +154,7 @@ public class SchoolRing extends JPanel {
     	DirOptions.loadDir(musicDir1);
     	DirOptions.loadDir(musicDir2);
     	DirOptions.loadDir(musicDir3);
-    	if(!args[0].contains("nogui")) {
+    	if(!(args.length>0) & !args.toString().contains("nogui")) {
     	//Create GUI
     	System.out.println("[GUI]: program started in gui mode.");
         JFrame frame = new JFrame ("SchoolRing");
