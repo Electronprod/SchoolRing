@@ -19,7 +19,7 @@ import electron.data.database;
 import electron.ring.ringThread;
 import electron.utils.logger;
 
-public class SchoolRing extends JPanel {
+public class SchoolRing extends JPanel {    
 	//Directories for music
 	public static File musicDir1 = new File("fromlesson");
 	public static File musicDir2 = new File("tolesson");
@@ -154,7 +154,9 @@ public class SchoolRing extends JPanel {
     	DirOptions.loadDir(musicDir1);
     	DirOptions.loadDir(musicDir2);
     	DirOptions.loadDir(musicDir3);
+    	if(!args[0].contains("nogui")) {
     	//Create GUI
+    	System.out.println("[GUI]: program started in gui mode.");
         JFrame frame = new JFrame ("SchoolRing");
         frame.setDefaultCloseOperation (JFrame.HIDE_ON_CLOSE);
         frame.getContentPane().add (new SchoolRing());
@@ -173,6 +175,9 @@ public class SchoolRing extends JPanel {
               e.getWindow().dispose();
             }
         });
+    	}else {
+    		 System.out.println("[GUI]: program started in nogui mode.");
+    	}
         //Start time checker thread
         Thread c = new ringThread();
         c.start();
