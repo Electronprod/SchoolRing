@@ -25,5 +25,6 @@ WARNING: don't forget to select ring type!
 You can run program without gui using "nogui" argument in command line.
 
 ## License
-Json.Simple library - Apache License 2.0
+JSON.SIMPLE Library - Apache License 2
+More info github.com/fangyidong/json-simple?tab=Apache-2.0-1-ov-file
 
